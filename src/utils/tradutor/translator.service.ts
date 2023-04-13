@@ -28,7 +28,7 @@ export class TranslatorService {
   constructor(private httpService: HttpService) {
   }
 
-  public async translate() : Promise<string>{
+  public async execute() : Promise<string>{
 
     let result
     const data = [{

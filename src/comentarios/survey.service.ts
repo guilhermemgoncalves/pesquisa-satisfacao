@@ -3,22 +3,24 @@ import { CreateSurveyDto } from "./dto/create-survey.dto";
 import { UpdateSurveyDto } from "./dto/update-survey.dto";
 import { TranslatorService } from "../utils/tradutor/translator.service";
 import { SentimentAnalysisService } from "../utils/sentiment-analysis/sentiment-analysis.service";
-import { SentimentAnalysis } from "../utils/models/SentmentAnalysis";
-
-
+import { ContentModeratorService } from "../utils/content-moderator/content-moderator.service";
 
 @Injectable()
 export class SurveyService {
   private readonly logger = new Logger(SurveyService.name)
-  constructor(private tradutorService: TranslatorService,private sentimentAnalysisService: SentimentAnalysisService) {
+  constructor(private tradutorService: TranslatorService,private sentimentAnalysisService: SentimentAnalysisService, private contentModeratorService : ContentModeratorService) {
   }
 
-  async create(createComentarioDto: CreateSurveyDto) : Promise<SentimentAnalysis> {
-    this.tradutorService.textToTranslate = createComentarioDto.comentario;
-    const translateResult = await this.tradutorService.translate();
-    this.logger.log(translateResult);
+  async create(createSurveyDto: CreateSurveyDto) : Promise<any> {
+
+    this.contentModeratorService.textInput = createSurveyDto.comentario
+    await this.contentModeratorService.execute()
+
+    this.tradutorService.textToTranslate = this.contentModeratorService.textOutput;
+    const translateResult = await this.tradutorService.execute();
 
     this.sentimentAnalysisService.textToAnalysis = [translateResult]
+
     await this.sentimentAnalysisService.Execute();
     return this.sentimentAnalysisService.analisysResponse
   }
@@ -31,7 +33,7 @@ export class SurveyService {
     return `This action returns a #${id} comentario`;
   }
 
-  update(id: number, updateComentarioDto: UpdateSurveyDto) {
+  update(id: number, updateSurveyDto: UpdateSurveyDto) {
     return `This action updates a #${id} comentario`;
   }
 
