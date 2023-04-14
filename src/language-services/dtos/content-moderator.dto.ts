@@ -1,4 +1,4 @@
-export interface ContentModerator {
+export interface ContentModeratorDto {
   OriginalText: string
   NormalizedText?: string
   AutoCorrectedText?: string

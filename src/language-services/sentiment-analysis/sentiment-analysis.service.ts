@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { AzureKeyCredential, SentimentAnalysisResult, TextAnalysisClient } from "@azure/ai-language-text";
 import * as process from "process";
-import { SentimentAnalysis } from "../models/SentmentAnalysis";
+import { SentimentAnalysis } from "../dtos/sentiment-analysis.dto";
 
 @Injectable()
 export class SentimentAnalysisService {

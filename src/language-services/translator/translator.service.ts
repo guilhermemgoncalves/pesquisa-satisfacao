@@ -2,6 +2,8 @@ import { HttpException, Injectable, Logger } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
 import * as process from "process";
 import { lastValueFrom } from "rxjs";
+import { TranslationDto } from "../dtos/translation.dto";
+import { AxiosResponse } from "axios";
 const { v4: uuidv4 } = require("uuid");
 
 @Injectable()
@@ -17,6 +19,7 @@ export class TranslatorService {
     'api-version': '3.0',
     'to': 'pt-br'
   }
+  private url = process.env.TRANSLATOR_ENDPOINT + "/translate"
   set textToTranslate(value: string) {
     this._textToTranslate = value;
   }
@@ -30,19 +33,20 @@ export class TranslatorService {
 
   public async execute() : Promise<string>{
 
-    let result
-    const data = [{
+    let result : TranslationDto
+    const reqData = [{
       'text': this._textToTranslate
     }];
     try {
       this.logger.log("Serviço de Tradução em Execução")
-      result = await lastValueFrom(this.httpService.post(process.env.TRANSLATOR_ENDPOINT + "/translate", data, { params: this.reqParams,  headers: this.reqHeaders }));
+      const {data} = await lastValueFrom(this.httpService.post<TranslationDto>(process.env.TRANSLATOR_ENDPOINT + "/translate", reqData, { params: this.reqParams,  headers: this.reqHeaders }));
+      result = data[0]
     } catch (e) {
       this.logger.error("Erro ao acessar api de tradução:" + e.message)
       throw new HttpException(e.message, 400)
     }
     this.logger.log("Serviço de Tradução Concluido")
-    result  = result.data[0].translations[0].text;
-    return result;
+    const resultText  = result.translations[0].text;
+    return resultText;
   }
 }

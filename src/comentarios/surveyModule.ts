@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { SurveyService } from './survey.service';
 import { SurveyController } from './surveyController';
-import { LanguageUtilsModule } from "../utils/languageUtilsModule";
+import { LanguageServicesModule } from "../language-services/languageServicesModule";
 
 @Module({
-  imports: [LanguageUtilsModule],
+  imports: [LanguageServicesModule],
   controllers: [SurveyController],
   providers: [SurveyService]
 })

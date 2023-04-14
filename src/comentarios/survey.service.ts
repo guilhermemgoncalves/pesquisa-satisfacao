@@ -1,9 +1,10 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { CreateSurveyDto } from "./dto/create-survey.dto";
 import { UpdateSurveyDto } from "./dto/update-survey.dto";
-import { TranslatorService } from "../utils/tradutor/translator.service";
-import { SentimentAnalysisService } from "../utils/sentiment-analysis/sentiment-analysis.service";
-import { ContentModeratorService } from "../utils/content-moderator/content-moderator.service";
+import { TranslatorService } from "../language-services/translator/translator.service";
+import { SentimentAnalysisService } from "../language-services/sentiment-analysis/sentiment-analysis.service";
+import { ContentModeratorService } from "../language-services/content-moderator/content-moderator.service";
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class SurveyService {
@@ -12,6 +13,11 @@ export class SurveyService {
   }
 
   async create(createSurveyDto: CreateSurveyDto) : Promise<any> {
+
+    //Transformando e-mail do usuário em hash (para não armazenar email)
+    const hash = await bcrypt.hash(createSurveyDto.userEmail, await bcrypt.genSalt());
+    console.log(hash)
+
 
     this.contentModeratorService.textInput = createSurveyDto.comentario
     await this.contentModeratorService.execute()
@@ -25,8 +31,8 @@ export class SurveyService {
     return this.sentimentAnalysisService.analisysResponse
   }
 
-  findAll() {
-    return `This action returns all comentarios`;
+  async findAll() {
+    return `this action return all survey`
   }
 
   findOne(id: number) {
