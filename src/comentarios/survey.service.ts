@@ -18,17 +18,20 @@ export class SurveyService {
     const hash = await bcrypt.hash(createSurveyDto.userEmail, await bcrypt.genSalt());
     console.log(hash)
 
+    // this.tradutorService.textToTranslate = createSurveyDto.comentario
+    // return await this.tradutorService.execute();
 
     this.contentModeratorService.textInput = createSurveyDto.comentario
     await this.contentModeratorService.execute()
 
-    this.tradutorService.textToTranslate = this.contentModeratorService.textOutput;
-    const translateResult = await this.tradutorService.execute();
-
-    this.sentimentAnalysisService.textToAnalysis = [translateResult]
-
-    await this.sentimentAnalysisService.Execute();
-    return this.sentimentAnalysisService.analisysResponse
+    //
+    // this.tradutorService.textToTranslate = this.contentModeratorService.textOutput;
+    // const translateResult = await this.tradutorService.execute();
+    //
+    // this.sentimentAnalysisService.textToAnalysis = [translateResult]
+    //
+    // await this.sentimentAnalysisService.Execute();
+    // return this.sentimentAnalysisService.analisysResponse
   }
 
   async findAll() {
