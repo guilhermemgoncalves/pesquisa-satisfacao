@@ -9,11 +9,9 @@ export class HttpHelperService {
   set params(value) {
     this._params = value;
   }
-
   set headers(value) {
     this._headers = value;
   }
-
   set url(value: string) {
     this._url = value;
   }
@@ -25,20 +23,18 @@ export class HttpHelperService {
   private _url: string;
 
   constructor(private httpService: HttpService) {
-
   }
+  async Post<T>(reqBody : any) : Promise<T> {
 
-  async Post<T>(reqData : any) : Promise<T> {
-    let result : T
+
     try {
-      const {data} = await lastValueFrom(this.httpService.post<T>(this._url, reqData, { params: this._params,  headers: this._headers }));
+      const {data} = await lastValueFrom(this.httpService.post<T>(this._url, reqBody, { params: this._params,  headers: this._headers }));
       if(Array.isArray(data)){
         return data[0]
       }
       return data
     } catch (e) {
-      this.logger.error("Erro ao acessar api de tradução:" + e.message)
-      throw new HttpException(e.message, 400)
+      this.logger.error(`Erro ao acessar api de ${['name']} :${e.message}`)
     }
   }
 }

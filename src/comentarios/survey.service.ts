@@ -21,8 +21,8 @@ export class SurveyService {
     // this.tradutorService.textToTranslate = createSurveyDto.comentario
     // return await this.tradutorService.execute();
 
-    this.contentModeratorService.textInput = createSurveyDto.comentario
-    await this.contentModeratorService.execute()
+    this.contentModeratorService.inputText = createSurveyDto.comentario
+    return await this.contentModeratorService.execute()
 
     //
     // this.tradutorService.textToTranslate = this.contentModeratorService.textOutput;

@@ -1,23 +1,22 @@
-import { HttpException, Injectable, Logger } from "@nestjs/common";
-import { lastValueFrom } from "rxjs";
-import { HttpService } from "@nestjs/axios";
+import { Injectable, Logger } from "@nestjs/common";
 import * as process from "process";
 import { ContentModeratorDto, Term } from "../dtos/content-moderator.dto";
-const { v4: uuidv4 } = require("uuid");
+import { HttpHelperService } from "../../utils/http-helper/http-helper.service";
+import { isString } from "@nestjs/common/utils/shared.utils";
 
 @Injectable()
 export class ContentModeratorService {
-  get textOutput(): string {
-    return this._textOutput;
-  }
-  set textInput(value: string) {
-    this._textInput = value;
+
+  set inputText(value: string) {
+    if(!isString(value)){
+      throw new TypeError("O campo deve ser preenchido com um valor do tipo texto")
+    }
+    this._inputText = value;
   }
 
   private readonly logger = new Logger(ContentModeratorService.name);
-  private _textInput : string;
-  private _textOutput : string;
-  constructor(private httpService: HttpService) {
+  private _inputText : string;
+  constructor(private httpHelperService: HttpHelperService) {
   }
 
   private reqHeaders = {
@@ -31,47 +30,28 @@ export class ContentModeratorService {
     "classify": "True",
     "language": "por",
   }
+  private url: string = process.env.CONTENT_MODERATOR_ENDPOINT + "/contentmoderator/moderate/v1.0/ProcessText/Screen"
 
   /* sdk azure content moderator
   https://westus.dev.cognitive.microsoft.com/docs/services/57cf753a3f9b070c105bd2c1/operations/57cf753a3f9b070868a1f66f
   https://learn.microsoft.com/pt-br/azure/cognitive-services/content-moderator/client-libraries?tabs=visual-studio&pivots=programming-language-rest-api#moderate-text
  */
 
-  public async execute() : Promise<ContentModeratorDto>{
+  public async execute() : Promise<string>{
 
-    let result
-    let resultData : ContentModeratorDto
-    const dataText = {
-      'text': this._textInput
-    };
-    try {
-      this.logger.log("Serviço de moderação de conteudo em Execução")
-      result = await lastValueFrom(this.httpService.post<ContentModeratorDto>(process.env.CONTENT_MODERATOR_ENDPOINT + "/contentmoderator/moderate/v1.0/ProcessText/Screen", dataText, { params: this.reqParams,  headers: this.reqHeaders }));
+    let responseData : ContentModeratorDto
+    const reqData = this._inputText;
+    this.httpHelperService.url = this.url;
+    this.httpHelperService.params = this.reqParams;
+    this.httpHelperService.headers = this.reqHeaders;
 
-    } catch (e) {
-      this.logger.error("Erro ao acessar api de tradução:" + e.message)
-      console.log(e)
-      throw new HttpException(e.message, 400)
-    }
+    responseData  = await this.httpHelperService.Post<ContentModeratorDto>(reqData)
+
     this.logger.log("Serviço de moderação de conteudo Concluido")
 
-    resultData = this.processWords(result.data)
-    this._textOutput = this.cleanOfensiveWords(resultData)
-
-    return resultData;
+    return this.cleanOffensiveWords(responseData);
   }
-
-  processWords(dataResult): ContentModeratorDto{
-    let stringResult = JSON.stringify(dataResult)
-    while (stringResult.includes("\"{\\\"text\\\":\\\"")){
-      stringResult = stringResult.replace("\"{\\\"text\\\":\\","")
-    }
-    while (stringResult.includes("\\\"}")){
-      stringResult = stringResult.replace("\\\"}","")
-    }
-    return JSON.parse(stringResult);
-  }
-  cleanOfensiveWords(contentModeratorResponse : ContentModeratorDto){
+  private cleanOffensiveWords(contentModeratorResponse : ContentModeratorDto): string{
 
     let terms : Term[] = contentModeratorResponse.Terms
     let originalText : string  = contentModeratorResponse.OriginalText

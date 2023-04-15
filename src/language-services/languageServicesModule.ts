@@ -6,7 +6,7 @@ import { ContentModeratorService } from "./content-moderator/content-moderator.s
 import { UtilsModule } from "../utils/utils.module";
 
 @Module({
-  imports: [HttpModule, UtilsModule],
+  imports: [UtilsModule],
   providers: [TranslatorService, SentimentAnalysisService, ContentModeratorService],
   exports:  [TranslatorService, SentimentAnalysisService, ContentModeratorService]
 })
