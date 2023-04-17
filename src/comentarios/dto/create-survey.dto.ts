@@ -1,6 +1,6 @@
 export class CreateSurveyDto {
   userName!:string;
   userEmail?:string;
-  comentario!:string;
+  surveyMessage!:string;
   qualidadeSerico!:number;
 }

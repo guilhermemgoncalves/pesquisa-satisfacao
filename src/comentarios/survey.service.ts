@@ -9,6 +9,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Survey } from "./entities/survey.entity";
 import { Model } from "mongoose";
 import * as timers from "timers";
+import { dateTimestampProvider } from "rxjs/internal/scheduler/dateTimestampProvider";
 
 @Injectable()
 export class SurveyService {
@@ -22,17 +23,21 @@ export class SurveyService {
 
   async create(createSurveyDto: CreateSurveyDto) : Promise<any> {
 
-    //Transformando e-mail do usuário em hash (para não armazenar email)
-    // const hash = await bcrypt.hash(createSurveyDto.userEmail, await bcrypt.genSalt());
-    // console.log(hash)
+    this.contentModeratorService.inputText = createSurveyDto.surveyMessage;
+    const offensiveTerms = await this.contentModeratorService.getOffensiveWords();
+
+    console.log(await this.sentimentAnalysisService.Execute(createSurveyDto.surveyMessage))
+
+    // this.sentimentAnalysisService.textToAnalysis = [surveyText];
+    // console.log(await this.sentimentAnalysisService.Execute());
+
+    // this.sentimentAnalysisService.textToAnalysis = [createSurveyDto.surveyMessage];
+    // console.log(await this.sentimentAnalysisService.Execute());
+
+    return  offensiveTerms;
 
 
 
-    let jorge= { newuob: "niobiuo", Outro: { outro: "outro"}}
-    let al = { name: "pedro", age: 18, email:"Gmail@uo", DataType: jorge}
-
-    const createdSurvey =  new this.surveyModel(al)
-    return createdSurvey.save();
 
     // this.tradutorService.textToTranslate = createSurveyDto.comentario
     // return await this.tradutorService.execute();
@@ -48,6 +53,9 @@ export class SurveyService {
     //
     // await this.sentimentAnalysisService.Execute();
     // return this.sentimentAnalysisService.analisysResponse
+
+    // const createdSurvey =  new this.surveyModel(al)
+    // return createdSurvey.save();
   }
 
   async findAll() {

@@ -1,15 +1,30 @@
-import { HydratedDocument } from "mongoose";
+import mongoose, { HydratedDocument, now } from "mongoose";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { SentimentAnalysis } from "../../language-services/dtos/sentiment-analysis.dto";
 
 export type SurveyDocument = HydratedDocument<Survey>;
 
 @Schema()
 export class Survey {
+
     @Prop()
-    name: string;
+    nickname: string;
+
+    @Prop()
+    category: string;
+
+    @Prop({default: now()})
+    createdAt: Date;
 
     @Prop({required:true})
-    email: string;
+    surveyMessage: string;
+
+    @Prop()
+    translatedSurveyMessage: string;
+
+
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'SentimentAnalysis' })
+    surveySentiment: SentimentAnalysis
 
 }
 

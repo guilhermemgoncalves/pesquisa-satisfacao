@@ -5,27 +5,21 @@ import { SentimentAnalysis } from "../dtos/sentiment-analysis.dto";
 
 @Injectable()
 export class SentimentAnalysisService {
-  get analisysResponse() {
-    return this._analisysResponse;
-  }
 
   private readonly logger = new Logger(SentimentAnalysisService.name)
-  private _textToAnalysis: string[];
+  private _offensiveWords : string[];
 
-  get textToAnalysis(): string[] {
-    return this._textToAnalysis;
-  }
-
-  set textToAnalysis(value: string[]) {
-    this._textToAnalysis = value;
+  set offensiveWords(value: string[]) {
+    this._offensiveWords = value;
   }
 
   private _analisysResponse : SentimentAnalysis;
 
-  async Execute() {
+  async Execute(textToAnalysis: string) {
     const client = new TextAnalysisClient(process.env.LANGUAGE_SERVICE_ENDPOINT, new AzureKeyCredential(process.env.LANGUAGE_SERVICE_KEY));
     this.logger.log("Inicio da Analise de Sentimentos")
-    let results : SentimentAnalysisResult[] = await client.analyze("SentimentAnalysis", this._textToAnalysis);
+
+    let results : SentimentAnalysisResult[] = await client.analyze("SentimentAnalysis", [textToAnalysis]);
 
     for (const result of results) {
       if (result.error === undefined) {
@@ -39,6 +33,7 @@ export class SentimentAnalysisService {
         {
           delete sentence['offset']
           delete sentence['opinions']
+
         }
 
         this._analisysResponse = resultManipulation;
@@ -47,7 +42,8 @@ export class SentimentAnalysisService {
         console.error("Encountered an error:", result.error);
       }
     }
-
     this.logger.log("Analise de Sentimentos Concluida")
+    this._analisysResponse.originalText = textToAnalysis
+    return this._analisysResponse
   }
 }

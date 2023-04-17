@@ -1,4 +1,7 @@
-export interface SentimentAnalysis {
+import { HydratedDocument } from "mongoose";
+import { Schema } from "@nestjs/mongoose";
+export interface SentimentAnalysis  {
+  originalText: string
   sentiment: string
   confidenceScores: ConfidenceScores
   sentences: Sentence[]
