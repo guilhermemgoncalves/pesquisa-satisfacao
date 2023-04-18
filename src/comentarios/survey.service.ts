@@ -27,35 +27,8 @@ export class SurveyService {
     const offensiveTerms = await this.contentModeratorService.getOffensiveWords();
 
     console.log(await this.sentimentAnalysisService.Execute(createSurveyDto.surveyMessage))
-
-    // this.sentimentAnalysisService.textToAnalysis = [surveyText];
-    // console.log(await this.sentimentAnalysisService.Execute());
-
-    // this.sentimentAnalysisService.textToAnalysis = [createSurveyDto.surveyMessage];
-    // console.log(await this.sentimentAnalysisService.Execute());
-
     return  offensiveTerms;
 
-
-
-
-    // this.tradutorService.textToTranslate = createSurveyDto.comentario
-    // return await this.tradutorService.execute();
-
-    // this.contentModeratorService.inputText = createSurveyDto.comentario
-    // return await this.contentModeratorService.execute()
-
-    //
-    // this.tradutorService.textToTranslate = this.contentModeratorService.textOutput;
-    // const translateResult = await this.tradutorService.execute();
-    //
-    // this.sentimentAnalysisService.textToAnalysis = [translateResult]
-    //
-    // await this.sentimentAnalysisService.Execute();
-    // return this.sentimentAnalysisService.analisysResponse
-
-    // const createdSurvey =  new this.surveyModel(al)
-    // return createdSurvey.save();
   }
 
   async findAll() {
