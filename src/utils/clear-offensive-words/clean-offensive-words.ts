@@ -1,13 +1,13 @@
 export class CleanOffensiveWords{
-  public cleanOffensiveWords(offensiveTerms: string[], text: string): string{
+  public cleanOffensiveWords(OffensiveWords: string[], text: string): string{
 
-    if (offensiveTerms == null || offensiveTerms.length == 0){
+    if (OffensiveWords == null || OffensiveWords.length == 0){
       return text;
     }
 
     let manipulatedText = text
 
-    for(const term of offensiveTerms){
+    for(const term of OffensiveWords){
       manipulatedText = manipulatedText.replace(term, "*****" )
     }
     return manipulatedText

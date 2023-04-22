@@ -21,7 +21,8 @@ export class Survey {
 
     @Prop()
     translatedSurveyMessage: string;
-
+    @Prop()
+    rate: number;
 
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'SentimentAnalysis' })
     surveySentiment: SentimentAnalysis

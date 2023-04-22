@@ -4,44 +4,45 @@ import { UpdateSurveyDto } from "./dto/update-survey.dto";
 import { TranslatorService } from "../language-services/translator/translator.service";
 import { SentimentAnalysisService } from "../language-services/sentiment-analysis/sentiment-analysis.service";
 import { ContentModeratorService } from "../language-services/content-moderator/content-moderator.service";
-import * as bcrypt from 'bcrypt';
 import { InjectModel } from "@nestjs/mongoose";
 import { Survey } from "./entities/survey.entity";
 import { Model } from "mongoose";
-import * as timers from "timers";
-import { dateTimestampProvider } from "rxjs/internal/scheduler/dateTimestampProvider";
 
 @Injectable()
 export class SurveyService {
-  private readonly logger = new Logger(SurveyService.name)
+  private readonly logger = new Logger(SurveyService.name);
+
   constructor(
     private tradutorService: TranslatorService,
     private sentimentAnalysisService: SentimentAnalysisService,
-    private contentModeratorService : ContentModeratorService,
+    private contentModeratorService: ContentModeratorService,
     @InjectModel(Survey.name) private surveyModel: Model<Survey>) {
   }
 
-  async create(createSurveyDto: CreateSurveyDto) : Promise<any> {
+  async create(createSurveyDto: CreateSurveyDto): Promise<any> {
 
     this.contentModeratorService.inputText = createSurveyDto.surveyMessage;
-    const offensiveTerms = await this.contentModeratorService.getOffensiveWords();
+    //TODO: Alterar extrair a limpeza de palavras de dentro da analise de sentimentos e limpar as frases e realizar a tradução dentro de seus respectivos serviços
 
-    console.log(await this.sentimentAnalysisService.Execute(createSurveyDto.surveyMessage))
-    return  offensiveTerms;
-
+    this.sentimentAnalysisService.offensiveWords = await this.contentModeratorService.getOffensiveWords();
+    let survey: Survey = new Survey();
+    survey.surveySentiment = await this.sentimentAnalysisService.GetSentimentAnalisys(createSurveyDto.surveyMessage);
+    this.logger.log("Survey Criada com Sucesso")
+    console.log(survey);
+    return survey;
   }
 
   async findAll() {
-    return `this action return all survey`
+    return `this action return all survey`;
   }
 
   findOne(id: number) {
     return `This action returns a #${id} comentario`;
   }
 
-  update(id: number, updateSurveyDto: UpdateSurveyDto) {
-    return `This action updates a #${id} comentario`;
-  }
+  // update(id: number, updateSurveyDto: UpdateSurveyDto) {
+  //   return `This action updates a #${id} comentario`;
+  // }
 
   remove(id: number) {
     return `This action removes a #${id} comentario`;
