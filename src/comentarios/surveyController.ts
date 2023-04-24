@@ -24,7 +24,7 @@ export class SurveyController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateComentarioDto: UpdateSurveyDto) {
-    return this.comentariosService.update(+id, updateComentarioDto);
+    // return this.comentariosService.update(+id, updateComentarioDto);
   }
 
   @Delete(':id')

@@ -1,5 +1,4 @@
-import { HydratedDocument } from "mongoose";
-import { Schema } from "@nestjs/mongoose";
+
 export interface SentimentAnalysis  {
   originalText: string
   sentiment: string
