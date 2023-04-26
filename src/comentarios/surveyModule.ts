@@ -1,12 +1,10 @@
-import { Module } from '@nestjs/common';
-import { SurveyService } from './survey.service';
-import { SurveyController } from './surveyController';
-import { LanguageServicesModule } from "../language-services/languageServicesModule";
-import { MongooseModule } from "@nestjs/mongoose";
-import { Survey, SurveySchema } from "./entities/survey.entity";
+import {Module} from '@nestjs/common';
+import {SurveyService} from './survey.service';
+import {SurveyController} from './surveyController';
+import {LanguageServicesModule} from "../language-services/languageServicesModule";
 
 @Module({
-  imports: [LanguageServicesModule, MongooseModule.forFeature([{ name: Survey.name, schema: SurveySchema }])],
+  imports: [LanguageServicesModule],
   controllers: [SurveyController],
   providers: [SurveyService]
 })

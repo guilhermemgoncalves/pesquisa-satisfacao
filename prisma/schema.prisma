@@ -8,38 +8,43 @@ datasource db {
 }
 
 model confidence_scores {
-  id                 Int                  @id @unique(map: "id") @default(autoincrement())
-  positive           Float?               @db.Float
-  neutral            Float?               @db.Float
-  negative           Float?               @db.Float
-  sentiment_analysis sentiment_analysis[]
+  id                    Int                 @id @unique(map: "id") @default(autoincrement())
+  positive              Float?              @db.Float
+  neutral               Float?              @db.Float
+  negative              Float?              @db.Float
+  sentiment_analysis_id Int?
+  sentence_id           Int?
+  sentiment_analysis    sentiment_analysis? @relation(fields: [sentiment_analysis_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "confidence_scores_ibfk_1")
+  sentence              sentence?           @relation(fields: [sentence_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "confidence_scores_ibfk_2")
+
+  @@index([sentiment_analysis_id], map: "confidence_scores_ibfk_1")
+  @@index([sentence_id], map: "confidence_scores_ibfk_2")
 }
 
 model sentence {
-  id                 Int                  @id @unique(map: "id") @default(autoincrement())
-  text               String?              @db.VarChar(1200)
-  sentiment          String?              @db.VarChar(20)
-  length             Int?
-  sentiment_analysis sentiment_analysis[]
+  id                    Int                 @id @unique(map: "id") @default(autoincrement())
+  text                  String?             @db.VarChar(1200)
+  sentiment             String?             @db.VarChar(20)
+  length                Int?
+  sentiment_analysis_id Int
+  confidence_scores     confidence_scores[]
+  sentiment_analysis    sentiment_analysis  @relation(fields: [sentiment_analysis_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sentence_ibfk_1")
+
+  @@index([sentiment_analysis_id], map: "sentence_ibfk_1")
 }
 
 model sentiment_analysis {
-  id                   Int               @id @unique(map: "id") @default(autoincrement())
-  original_text        String?           @db.VarChar(1000)
-  confidence_scores_id Int
-  sentiment            String            @db.VarChar(20)
-  sentence_id          Int
-  confidence_scores    confidence_scores @relation(fields: [confidence_scores_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sentiment_analysis_ibfk_1")
-  sentence             sentence          @relation(fields: [sentence_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sentiment_analysis_ibfk_2")
+  id                   Int                 @id @unique(map: "id") @default(autoincrement())
+  original_text        String?             @db.VarChar(1000)
+  sentiment            String              @db.VarChar(20)
+  confidence_scores    confidence_scores[]
+  sentence             sentence[]
   surveys              surveys[]
-
-  @@index([confidence_scores_id], map: "confidence_scores_id")
-  @@index([sentence_id], map: "sentence_id")
 }
 
 model surveys {
   id                      Int                 @id @unique(map: "id") @default(autoincrement())
-  nickname                String              @unique(map: "nickname") @db.VarChar(50)
+  nickname                String              @db.VarChar(50)
   category                String              @db.VarChar(30)
   rate                    Int?
   sentiment_id            Int?

@@ -7,7 +7,7 @@ export type SurveyDocument = HydratedDocument<Survey>;
 @Schema()
 export class Survey {
 
-    @Prop()
+
     nickname: string;
 
     @Prop()
