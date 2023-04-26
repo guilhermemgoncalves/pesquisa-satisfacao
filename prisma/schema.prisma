@@ -46,9 +46,9 @@ model surveys {
   id                      Int                 @id @unique(map: "id") @default(autoincrement())
   nickname                String              @db.VarChar(50)
   category                String              @db.VarChar(30)
-  rate                    Int?
-  sentiment_id            Int?
-  surveyMessage           String?             @db.VarChar(1000)
+  rate                    Int
+  sentiment_id            Int
+  surveyMessage           String              @db.VarChar(1000)
   translatedSurveyMessage String?             @db.VarChar(1200)
   sentiment_analysis      sentiment_analysis? @relation(fields: [sentiment_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "surveys_ibfk_1")
 

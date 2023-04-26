@@ -6,7 +6,6 @@ import {ContentModeratorService} from "../language-services/content-moderator/co
 import {PrismaClient} from '@prisma/client'
 
 
-
 @Injectable()
 export class SurveyService {
     private readonly logger = new Logger(SurveyService.name);
@@ -14,30 +13,39 @@ export class SurveyService {
 
 
     constructor(
-        private tradutorService: TranslatorService,
+        private translatorService: TranslatorService,
         private sentimentAnalysisService: SentimentAnalysisService,
         private contentModeratorService: ContentModeratorService
     ) {
     }
 
     async create(createSurveyDto: CreateSurveyDto): Promise<any> {
-
         const {nickName, surveyMessage, category, rate} = createSurveyDto;
 
         this.contentModeratorService.inputText = surveyMessage;
         //TODO: Alterar extrair a limpeza de palavras de dentro da analise de sentimentos e limpar as frases e realizar a tradução dentro de seus respectivos serviços
 
         this.sentimentAnalysisService.offensiveWords = await this.contentModeratorService.getOffensiveWords();
+
         const surveySentiment = await this.sentimentAnalysisService.GetSentimentAnalisys(surveyMessage);
+
+        this.translatorService.textToTranslate = surveySentiment.originalText
+        let translatedText = await this.translatorService.translate()
+
+        if(translatedText == surveySentiment.originalText){
+            translatedText = undefined
+        }
+
         const sentences = surveySentiment.sentences
 
+        //TODO: Criar Repostory para acessar as Querys
         const result = await this.prismaClient.surveys.create({
             data: {
                 rate: rate,
                 category: category,
                 surveyMessage: surveySentiment.originalText,
                 nickname: nickName,
-                translatedSurveyMessage: surveySentiment.originalText,
+                translatedSurveyMessage: translatedText,
                 sentiment_analysis: {
                     create: {
                         original_text: surveySentiment.originalText,
@@ -54,8 +62,6 @@ export class SurveyService {
             }
         })
 
-        console.log(sentences)
-
         for (const sentence of sentences) {
             const {text, sentiment, confidenceScores, length} = sentence;
             await this.prismaClient.sentence.create({
@@ -65,6 +71,7 @@ export class SurveyService {
                     length: length,
                     sentiment_analysis_id: result.sentiment_id,
                     confidence_scores: {
+
                         create: {
                             positive: confidenceScores.positive,
                             negative: confidenceScores.negative,
@@ -81,18 +88,16 @@ export class SurveyService {
 
     async findAll() {
         return this.prismaClient.surveys.findMany({
-
                 include: {
                     sentiment_analysis: {
-                        include:
-                            {
-                                sentence:
-                                    {
-                                        include:
-                                            {confidence_scores: true}
-                                    },
-                                confidence_scores: true
-                            }
+                        include: {
+                            sentence: {
+                                include: {
+                                    confidence_scores: true
+                                }
+                            },
+                            confidence_scores: true
+                        }
                     }
                 }
             }
