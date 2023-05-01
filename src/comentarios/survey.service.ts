@@ -32,7 +32,7 @@ export class SurveyService {
         this.translatorService.textToTranslate = surveySentiment.originalText
         let translatedText = await this.translatorService.translate()
 
-        if(translatedText == surveySentiment.originalText){
+        if (translatedText == surveySentiment.originalText) {
             translatedText = undefined
         }
 
@@ -83,11 +83,18 @@ export class SurveyService {
         }
 
         this.logger.log("Survey Criada com Sucesso");
-        // return result;
+        return result.id
     }
 
     async findAll() {
+
+        let nicknamer = undefined
+        let rater = undefined;
+
+
+
         return this.prismaClient.surveys.findMany({
+            where:{nickname: nicknamer, rate: {lt: rater}},
                 include: {
                     sentiment_analysis: {
                         include: {
@@ -104,8 +111,23 @@ export class SurveyService {
         )
     }
 
-    findOne(id: number) {
-        return `This action returns a #${id} comentario`;
+    async findOne(id: number) {
+        return this.prismaClient.surveys.findMany({
+                where: {id: Number(id)},
+                include: {
+                    sentiment_analysis: {
+                        include: {
+                            sentence: {
+                                include: {
+                                    confidence_scores: true
+                                }
+                            },
+                            confidence_scores: true
+                        }
+                    }
+                }
+            }
+        )
     }
 
     // update(id: number, updateSurveyDto: UpdateSurveyDto) {

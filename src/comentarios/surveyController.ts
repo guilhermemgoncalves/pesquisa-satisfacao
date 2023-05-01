@@ -5,30 +5,31 @@ import { UpdateSurveyDto } from './dto/update-survey.dto';
 
 @Controller('survey')
 export class SurveyController {
-  constructor(private readonly comentariosService: SurveyService) {}
+  constructor(private readonly surveyService: SurveyService) {}
 
   @Post()
-  create(@Body() createComentarioDto: CreateSurveyDto) {
-    return this.comentariosService.create(createComentarioDto);
+  create(@Body() createSurveyDto: CreateSurveyDto) {
+    return this.surveyService.create(createSurveyDto);
   }
 
   @Get()
   findAll() {
-    return this.comentariosService.findAll();
+    return this.surveyService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.comentariosService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    console.log("findone")
+    return this.surveyService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateComentarioDto: UpdateSurveyDto) {
+  update(@Param('id') id: string, @Body() updateSurveyDto: UpdateSurveyDto) {
     // return this.comentariosService.update(+id, updateComentarioDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.comentariosService.remove(+id);
+    return this.surveyService.remove(+id);
   }
 }
