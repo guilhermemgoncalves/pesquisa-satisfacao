@@ -98,12 +98,12 @@ export class SurveyService {
                 include: {
                     sentiment_analysis: {
                         include: {
+                            confidence_scores: true,
                             sentence: {
                                 include: {
                                     confidence_scores: true
                                 }
-                            },
-                            confidence_scores: true
+                            }
                         }
                     }
                 }
@@ -112,17 +112,31 @@ export class SurveyService {
     }
 
     async findOne(id: number) {
-        return this.prismaClient.surveys.findMany({
+        return this.prismaClient.surveys.findFirst({
                 where: {id: Number(id)},
                 include: {
                     sentiment_analysis: {
                         include: {
                             sentence: {
                                 include: {
-                                    confidence_scores: true
+                                    confidence_scores: {
+                                        select: {
+                                            id: true,
+                                            positive: true,
+                                            negative: true,
+                                            neutral: true
+                                        }
+                                    }
                                 }
                             },
-                            confidence_scores: true
+                            confidence_scores: {
+                                select: {
+                                    id: true,
+                                    positive: true,
+                                    negative: true,
+                                    neutral: true
+                                }
+                            }
                         }
                     }
                 }
